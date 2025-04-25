@@ -15,10 +15,19 @@ export const useLoginMutation = () => {
       request.post("/api/auth/sign-in", data).then((res) => res.data.data),
     onSuccess: async (data: UserType) => {
       const token = data.token;
-      Cookies.set("token", token, { expires: 1 / 24 });
       Cookies.set("user", JSON.stringify(data), { expires: 1 / 24 });
+      Cookies.set("token", token, { expires: 1 / 24 });
       notify("login");
       router.push("/");
+      console.log(token);
+    },
+    onError: (error: { status: number }) => {
+      if (error.status === 400) {
+        return notify("wrong_login");
+      }
+      if (error.status === 500) {
+        return notify(500);
+      }
     },
   });
 };

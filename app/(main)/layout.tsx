@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../globals.css";
 import Providres from "@/providers";
-// import Providres from "@/providers";
+import { Toaster } from "sonner";
+import Sidebar from "@/components/sidebar";
+import { ThemeProvider } from "@/components/ui/theme-provider";
+import Header from "@/components/header";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -21,8 +24,19 @@ export default function RootLayout({
 }>) {
   return (
     <Providres>
-      <html lang="en">
-        <body className={`${inter.className} antialiased`}>{children}</body>
+      <html suppressHydrationWarning lang="en">
+        <body className={`${inter.className} antialiased`}>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+            <main className="flex">
+              <Sidebar />
+              <div className="w-full mx-auto flex flex-col">
+                <Header />
+                {children}
+              </div>
+            </main>
+            <Toaster position="top-center" />
+          </ThemeProvider>
+        </body>
       </html>
     </Providres>
   );

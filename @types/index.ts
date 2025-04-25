@@ -6,11 +6,31 @@ export interface ChildrenType {
 
 export interface UserType {
   id: string;
-  name: string;
+  _id: string;
+  first_name: string;
+  last_name: string;
   email: string;
   password: string;
+  image: string;
   role: string;
-  createdAt: Date;
-  updatedAt: Date;
+  work_date: string;
+  work_end: string | null;
+  createdAt: string;
+  updatedAt: string;
   token: string;
+  status: string;
+  active: boolean;
+}
+
+export interface SidebarMenuType {
+  id: number;
+  title: string;
+  path: string;
+  Icon: React.ElementType;
+}
+
+export interface Breadcrmb_menuMenuType {
+  id: number;
+  title: string;
+  path: string;
 }
