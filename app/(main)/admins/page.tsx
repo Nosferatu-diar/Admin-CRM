@@ -21,9 +21,9 @@ const Admins = async () => {
 
   return (
     <HydrationBoundary state={dehydratedState}>
-      <div className="p-4 md:p-8 space-y-6">
-        <div className="overflow-hidden">
-          <h2 className="mb-3 font-bold text-xl">Adminlar</h2>
+      <div className="space-y-4">
+        <h1 className="text-xl font-bold">Adminlar</h1>
+        <div className="overflow-hidden ">
           <AdminTable />
         </div>
       </div>

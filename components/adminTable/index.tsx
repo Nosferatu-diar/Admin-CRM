@@ -43,7 +43,7 @@ const AdminTable = () => {
           <tbody>
             {data?.map((manager: ManagersType, index: number) => (
               <tr key={manager._id} className="border-b hover:bg-muted">
-                <td className="px-4 py-2">{index + 1}</td>
+                <td className="px-4 py-2 font-semibold">{index + 1}</td>
                 <td className="px-4 py-2">{manager.first_name}</td>
                 <td className="px-4 py-2">{manager.last_name}</td>
                 <td className="px-4 py-2">{manager.email}</td>
