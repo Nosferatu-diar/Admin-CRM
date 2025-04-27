@@ -1,4 +1,4 @@
-import Table from "@/components/table";
+import ManagerTable from "@/components/managerTable";
 import { request } from "@/request";
 import {
   QueryClient,
@@ -25,7 +25,7 @@ const Managers = async () => {
   return (
     <div>
       <HydrationBoundary state={dehydratedState}>
-        <Table />
+        <ManagerTable />
       </HydrationBoundary>
     </div>
   );

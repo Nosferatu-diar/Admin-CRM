@@ -27,13 +27,18 @@ export default function RootLayout({
       <html suppressHydrationWarning lang="en">
         <body className={`${inter.className} antialiased`}>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            <main className="flex">
-              <Sidebar />
-              <div className="w-full mx-auto flex flex-col">
-                <Header />
-                {children}
+            <div className="flex h-screen overflow-hidden">
+              <aside className="w-[250px] h-full sticky top-0 left-0 overflow-y-auto">
+                <Sidebar />
+              </aside>
+
+              <div className="flex-1 flex flex-col overflow-y-auto">
+                <header className="sticky top-0 z-10 bg-background">
+                  <Header />
+                </header>
+                <main className="flex-1 p-4">{children}</main>
               </div>
-            </main>
+            </div>
             <Toaster position="top-center" />
           </ThemeProvider>
         </body>

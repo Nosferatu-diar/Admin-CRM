@@ -22,6 +22,16 @@ export interface UserType {
   active: boolean;
 }
 
+export interface ManagersType {
+  _id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  status: string;
+  createdAt?: string;
+  last_active_date?: string;
+}
+
 export interface SidebarMenuType {
   id: number;
   title: string;
