@@ -1,6 +1,14 @@
 import { toast } from "sonner";
 
-type NotificationApiType = "login" | "wrong_login" | 500 | "logout";
+type NotificationApiType =
+  | "login"
+  | "wrong_login"
+  | 500
+  | "logout"
+  | "edit_admin"
+  | "delete_admin"
+  | "created_admin"
+  | "edit_profile";
 
 export const notificationApi = () => {
   const notify = (type: NotificationApiType) => {
@@ -13,6 +21,14 @@ export const notificationApi = () => {
         return toast.error("Server bilan bog'lanishda xatolik!");
       case "logout":
         return toast.success("Siz muvaffaqiyatli chiqdingiz!");
+      case "edit_admin":
+        return toast.success("Ma'lumotlar muvaffaqiyatli o'zgartirildi!");
+      case "delete_admin":
+        return toast.success("Ma'lumotlar muvaffaqiyatli o'chirildi!");
+      case "created_admin":
+        return toast.success("Ma'lumotlar muvaffaqiyatli yaratildi!");
+      case "edit_profile":
+        return toast.success("Profil muvaffaqiyatli o'zgartirildi!");
       default:
         break;
     }

@@ -12,6 +12,7 @@ import { ModeToggle } from "../ui/ThemesBtn";
 import Image from "next/image";
 import { UserType } from "@/@types";
 import Cookies from "js-cookie";
+import Link from "next/link";
 
 const Header = () => {
   const [user, setUser] = React.useState<UserType | null>(null);
@@ -53,16 +54,18 @@ const Header = () => {
             </div>
           </div>
           <div className="w-[40px] h-[40px] bg-black dark:bg-white rounded-full relative flex items-center justify-center font-bold text-white dark:text-black">
-            {user?.image ? (
-              <Image
-                src={user.image}
-                alt={user.first_name || "user avatar"}
-                fill
-                className="rounded-full object-cover"
-              />
-            ) : (
-              user?.first_name?.slice(0, 1)
-            )}
+            <Link href={"/profile"}>
+              {user?.image ? (
+                <Image
+                  src={user.image}
+                  alt={user.first_name || "user avatar"}
+                  fill
+                  className="rounded-full object-cover"
+                />
+              ) : (
+                user?.first_name?.slice(0, 1)
+              )}
+            </Link>
           </div>
         </div>
       </nav>
