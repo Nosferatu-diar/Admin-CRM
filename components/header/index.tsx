@@ -18,14 +18,22 @@ const Header = () => {
   const [user, setUser] = React.useState<UserType | null>(null);
 
   React.useEffect(() => {
-    const cookieUser = Cookies.get("user");
-    if (cookieUser) {
-      try {
-        setUser(JSON.parse(cookieUser));
-      } catch (error) {
-        console.error("Cookie parsing error:", error);
+    const updateUserFromCookie = () => {
+      const cookieUser = Cookies.get("user");
+      if (cookieUser) {
+        try {
+          setUser(JSON.parse(cookieUser));
+        } catch (error) {
+          console.error("Cookie parsing error:", error);
+        }
       }
-    }
+    };
+
+    updateUserFromCookie(); // ilk yuklashda
+
+    window.addEventListener("user-updated", updateUserFromCookie);
+    return () =>
+      window.removeEventListener("user-updated", updateUserFromCookie);
   }, []);
 
   return (

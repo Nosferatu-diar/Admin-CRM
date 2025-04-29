@@ -5,13 +5,13 @@ export interface ChildrenType {
 }
 
 export interface UserType {
-  id: string;
-  _id: string;
+  id?: string;
+  _id?: string;
   first_name: string;
   last_name: string;
   email: string;
   password: string;
-  image: string;
+  image?: string;
   role: string;
   work_date: string;
   work_end: string | null;
@@ -30,6 +30,8 @@ export interface ManagersType {
   status: string;
   createdAt?: string;
   last_active_date?: string;
+  image?: string | null;
+  role?: string;
 }
 
 export interface SidebarMenuType {

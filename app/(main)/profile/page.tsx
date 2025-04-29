@@ -7,28 +7,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
-import { Edit, EyeIcon, MailIcon, UserIcon } from "lucide-react";
-import { useEiditProfile } from "@/request/mutation"; // senga tashlangan mutation
+import { Edit, MailIcon, UserIcon } from "lucide-react";
+import { useEditProfile, useUploadImage } from "@/request/mutation";
 
 const Profile = () => {
   const [edit, setEdit] = useState(true);
   const [user, setUser] = useState<UserType | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [form, setForm] = useState<{
-    email: string;
-    password: string;
-    first_name: string;
-    last_name: string;
-    image: string | File;
-  }>({
-    email: "",
-    password: "",
-    first_name: "",
-    last_name: "",
-    image: "",
+  const [form, setForm] = useState({
+    email: "" as string,
+    first_name: "" as string,
+    last_name: "" as string,
+    image: "" as string | File,
   });
 
-  const { mutate, isPending } = useEiditProfile();
+  const { mutate: editProfile, isPending } = useEditProfile();
+  const { mutate: uploadImage } = useUploadImage();
 
   useEffect(() => {
     const userCookie = Cookies.get("user");
@@ -38,11 +32,10 @@ const Profile = () => {
         setUser(parsedUser);
         setImagePreview(parsedUser.image);
         setForm({
-          email: parsedUser.email || "",
-          password: "",
-          first_name: parsedUser.first_name || "",
-          last_name: parsedUser.last_name || "",
-          image: parsedUser.image || "",
+          email: parsedUser.email || ("" as string),
+          first_name: parsedUser.first_name || ("" as string),
+          last_name: parsedUser.last_name || ("" as string),
+          image: parsedUser.image || ("" as string | File),
         });
       } catch (err) {
         console.error("Error parsing cookie", err);
@@ -59,11 +52,49 @@ const Profile = () => {
   };
 
   const handleSave = () => {
-    mutate(form, {
-      onSuccess: () => {
-        setEdit(true);
-      },
-    });
+    let updatedImage = form.image;
+
+    const updateProfileData = () => {
+      const payload = {
+        email: form.email as string,
+        first_name: form.first_name as string,
+        last_name: form.last_name as string,
+      };
+
+      editProfile(payload, {
+        onSuccess: () => {
+          const updatedUser: UserType = {
+            ...(user as UserType),
+            ...payload,
+            image:
+              updatedImage instanceof File
+                ? user?.image || ""
+                : updatedImage || "",
+            _id: user?._id ?? "",
+          };
+          setUser(updatedUser);
+          Cookies.set("user", JSON.stringify(updatedUser));
+          setUser(updatedUser);
+          setEdit(true);
+
+          window.dispatchEvent(new Event("user-updated")); /// extra
+        },
+      });
+    };
+
+    if (form.image instanceof File) {
+      const formData = new FormData();
+      formData.append("image", form.image);
+
+      uploadImage(formData, {
+        onSuccess: (data: { data: { data: { image: string } } }) => {
+          updatedImage = data.data.data.image;
+          updateProfileData();
+        },
+      });
+    } else {
+      updateProfileData();
+    }
   };
 
   return (
@@ -73,11 +104,10 @@ const Profile = () => {
       </h2>
 
       <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-        {/* Email */}
         <div className="relative">
           <MailIcon
             size={18}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
           />
           <Input
             type="email"
@@ -89,27 +119,10 @@ const Profile = () => {
           />
         </div>
 
-        {/* Password */}
-        <div className="relative">
-          <EyeIcon
-            size={18}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-          />
-          <Input
-            type="password"
-            placeholder="New Password"
-            disabled={edit}
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            className="pl-10"
-          />
-        </div>
-
-        {/* First Name */}
         <div className="relative">
           <UserIcon
             size={18}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
           />
           <Input
             type="text"
@@ -121,11 +134,10 @@ const Profile = () => {
           />
         </div>
 
-        {/* Last Name */}
         <div className="relative">
           <UserIcon
             size={18}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
           />
           <Input
             type="text"
@@ -152,7 +164,7 @@ const Profile = () => {
             <div className="w-40 h-40 rounded-full overflow-hidden">
               <Image
                 src={imagePreview}
-                alt="Profile Preview"
+                alt="Profile Image Preview"
                 width={160}
                 height={160}
                 className="object-cover w-full h-full"
@@ -161,7 +173,6 @@ const Profile = () => {
           </div>
         )}
 
-        {/* Agar edit rejimda bo'lmasa Save ko'rsat */}
         {!edit && (
           <div className="flex justify-center pt-5">
             <Button
@@ -176,7 +187,6 @@ const Profile = () => {
         )}
       </form>
 
-      {/* Edit / Cancel Button */}
       <div className="flex justify-center pt-4">
         <Button
           type="button"

@@ -8,7 +8,8 @@ type NotificationApiType =
   | "edit_admin"
   | "delete_admin"
   | "created_admin"
-  | "edit_profile";
+  | "edit_profile"
+  | "upload_image";
 
 export const notificationApi = () => {
   const notify = (type: NotificationApiType) => {
@@ -29,6 +30,8 @@ export const notificationApi = () => {
         return toast.success("Ma'lumotlar muvaffaqiyatli yaratildi!");
       case "edit_profile":
         return toast.success("Profil muvaffaqiyatli o'zgartirildi!");
+      case "upload_image":
+        return toast.success("Rasm muvaffaqiyatli yuklandi!");
       default:
         break;
     }

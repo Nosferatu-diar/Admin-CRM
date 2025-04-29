@@ -5,7 +5,7 @@ import { Badge } from "../ui/badge";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { request } from "@/request";
-import { Loader, MoreVertical } from "lucide-react";
+import { Loader, MoreHorizontal } from "lucide-react";
 import { ManagersType } from "@/@types";
 import {
   DropdownMenu,
@@ -17,6 +17,7 @@ import EditAdminModal from "./EditAdminModal";
 import DeleteAdminModal from "./DeleteAdminModal";
 import { Button } from "../ui/button";
 import AddAdminModal from "./AddAdminModal";
+import Image from "next/image";
 
 const AdminTable = () => {
   const { data, isLoading } = useQuery({
@@ -73,11 +74,23 @@ const AdminTable = () => {
             <tbody>
               {data?.map((manager: ManagersType, index: number) => (
                 <tr key={manager._id} className="border-b hover:bg-muted">
-                  <td className="px-4 py-2 font-semibold">{index + 1}</td>
-                  <td className="px-4 py-2">{manager.first_name}</td>
-                  <td className="px-4 py-2">{manager.last_name}</td>
-                  <td className="px-4 py-2">{manager.email}</td>
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-3 font-semibold">{index + 1}</td>
+                  <td className="w-[40px] h-[40px] bg-black mt-1 dark:bg-white rounded-full relative flex items-center justify-center font-bold text-white dark:text-black">
+                    {manager?.image ? (
+                      <Image
+                        src={manager.image}
+                        alt={manager.first_name || "manager avatar"}
+                        fill
+                        className="rounded-full object-cover"
+                      />
+                    ) : (
+                      manager?.first_name?.slice(0, 1)
+                    )}
+                  </td>
+                  <td className="px-4 py-3">{manager.first_name}</td>
+                  <td className="px-4 py-3">{manager.last_name}</td>
+                  <td className="px-4 py-3">{manager.email}</td>
+                  <td className="px-4 py-3">
                     <Badge
                       variant={
                         manager.status === "faol" ? "default" : "secondary"
@@ -86,23 +99,16 @@ const AdminTable = () => {
                       {manager.status}
                     </Badge>
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-3">
                     {manager.createdAt
                       ? format(new Date(manager.createdAt), "yyyy-MM-dd")
                       : "Noma'lum"}
                   </td>
-                  <td className="px-4 py-2">
-                    {manager.last_active_date
-                      ? format(
-                          new Date(manager.last_active_date),
-                          "yyyy-MM-dd HH:mm"
-                        )
-                      : "Noma'lum"}
-                  </td>
-                  <td className="px-4 py-2">
+
+                  <td className="px-4 py-3">
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <MoreVertical className="h-5 w-5 cursor-pointer" />
+                      <DropdownMenuTrigger className="flex w-full items-end justify-center">
+                        <MoreHorizontal className="cursor-pointer " />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         <DropdownMenuItem

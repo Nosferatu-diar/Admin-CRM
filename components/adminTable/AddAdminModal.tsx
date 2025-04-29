@@ -13,10 +13,17 @@ import { Label } from "../ui/label";
 
 export interface Props {
   open: boolean;
-  setOpen: (value: boolean) => void;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  admin: {
+    _id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    status: string;
+  };
 }
 
-const AddAdminModal = ({ open, setOpen }: Props) => {
+const AddAdminModal: React.FC<Props> = ({ open, setOpen }) => {
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
