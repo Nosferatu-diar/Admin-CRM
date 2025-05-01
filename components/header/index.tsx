@@ -29,7 +29,7 @@ const Header = () => {
       }
     };
 
-    updateUserFromCookie(); // ilk yuklashda
+    updateUserFromCookie();
 
     window.addEventListener("user-updated", updateUserFromCookie);
     return () =>

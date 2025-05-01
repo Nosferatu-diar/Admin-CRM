@@ -10,6 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useEditedAdmin } from "@/request/mutation";
 import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 export interface Props {
   open: boolean;
@@ -68,11 +75,19 @@ const EditAdminModal = ({ open, setOpen, admin }: Props) => {
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
           <Label htmlFor="status">Status</Label>
-          <Input
-            placeholder="Status"
+          {/* select */}
+          <Select
             value={form.status}
-            onChange={(e) => setForm({ ...form, status: e.target.value })}
-          />
+            onValueChange={(val) => setForm({ ...form, status: val })}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Statusni tanlang" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="faol">Faol</SelectItem>
+              <SelectItem value="ta'tilda">Tatilda</SelectItem>
+            </SelectContent>
+          </Select>
           <Button onClick={handleSubmit} disabled={isPending}>
             {isPending ? "Saqlanmoqda..." : "Save Changes"}
           </Button>

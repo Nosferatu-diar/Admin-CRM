@@ -1,12 +1,13 @@
 "use client";
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import { ScrollArea } from "../ui/scroll-area";
 import { Badge } from "../ui/badge";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { request } from "@/request";
 import { Loader, MoreHorizontal } from "lucide-react";
-import { ManagersType } from "@/@types";
+import { ManagersType, UserType } from "@/@types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,21 +19,66 @@ import DeleteAdminModal from "./DeleteAdminModal";
 import { Button } from "../ui/button";
 import AddAdminModal from "./AddAdminModal";
 import Image from "next/image";
+import Cookies from "js-cookie";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+type Params = {
+  status?: string;
+  search?: string;
+};
 
 const AdminTable = () => {
-  const { data, isLoading } = useQuery({
-    queryKey: ["admins"],
+  const [selectedAdmin, setSelectedAdmin] = useState<ManagersType | null>(null);
+  const [selectedAdminId, setSelectedAdminId] = useState<string | null>(null);
+  const [user, setUser] = useState<UserType | null>(null);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openAdd, setOpenAdd] = useState(false);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all");
+
+  const params: Params = {};
+  if (status !== "all") params.status = status;
+  if (search.trim()) params.search = search.trim();
+
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["admins", status, search],
     queryFn: async () => {
-      const res = await request.get("/api/staff/all-admins");
+      const res = await request.get("/api/staff/all-admins", {
+        params: Object.keys(params).length ? params : {},
+      });
       return res.data.data;
     },
   });
 
-  const [openEdit, setOpenEdit] = useState(false);
-  const [selectedAdmin, setSelectedAdmin] = useState<ManagersType | null>(null);
-  const [openDelete, setOpenDelete] = useState(false);
-  const [selectedAdminId, setSelectedAdminId] = useState<string | null>(null);
-  const [openAdd, setOpenAdd] = useState(false);
+  useEffect(() => {
+    const updateUserFromCookie = () => {
+      const cookieUser = Cookies.get("user");
+      if (cookieUser) {
+        try {
+          setUser(JSON.parse(cookieUser));
+        } catch (error) {
+          console.error("Cookie parsing error:", error);
+        }
+      }
+    };
+
+    updateUserFromCookie();
+    window.addEventListener("user-updated", updateUserFromCookie);
+    return () =>
+      window.removeEventListener("user-updated", updateUserFromCookie);
+  }, []);
+
+  useEffect(() => {
+    refetch();
+  }, [search, status]);
 
   if (isLoading) {
     return (
@@ -46,14 +92,30 @@ const AdminTable = () => {
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold">Adminlar</h1>
-        <Button
-          variant="outline"
-          onClick={() => {
-            setOpenAdd(true);
-          }}
-        >
-          Admin Qo&apos;shish
-        </Button>
+        <div className="flex items-center gap-2">
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Ism bo‘yicha qidirish..."
+            className="w-[200px]"
+          />
+          <Select
+            defaultValue="all"
+            onValueChange={(value) => setStatus(value)}
+          >
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Barchasi</SelectItem>
+              <SelectItem value="faol">Faol</SelectItem>
+              <SelectItem value="tatilda">Tatilda</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" onClick={() => setOpenAdd(true)}>
+            Admin Qo‘shish
+          </Button>
+        </div>
       </div>
 
       <div className="w-full overflow-x-auto">
@@ -62,11 +124,11 @@ const AdminTable = () => {
             <thead className="bg-gray-100 dark:bg-zinc-900 text-gray-700 dark:text-white border-b">
               <tr>
                 <th className="px-4 py-3">#</th>
+                <th className="px-4 py-3">Img</th>
                 <th className="px-4 py-3">First Name</th>
                 <th className="px-4 py-3">Last Name</th>
                 <th className="px-4 py-3">Email</th>
                 <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Created</th>
                 <th className="px-4 py-3">Last Active</th>
                 <th className="px-4 py-3">Actions</th>
               </tr>
@@ -75,7 +137,7 @@ const AdminTable = () => {
               {data?.map((manager: ManagersType, index: number) => (
                 <tr key={manager._id} className="border-b hover:bg-muted">
                   <td className="px-4 py-3 font-semibold">{index + 1}</td>
-                  <td className="w-[40px] h-[40px] bg-black mt-1 dark:bg-white rounded-full relative flex items-center justify-center font-bold text-white dark:text-black">
+                  <td className="w-[40px] h-[40px] bg-black dark:bg-white rounded-full relative flex items-center justify-center font-bold text-white dark:text-black">
                     {manager?.image ? (
                       <Image
                         src={manager.image}
@@ -93,7 +155,11 @@ const AdminTable = () => {
                   <td className="px-4 py-3">
                     <Badge
                       variant={
-                        manager.status === "faol" ? "default" : "secondary"
+                        manager.status === "faol"
+                          ? "default"
+                          : manager.status === "ishdan bo'shatilgan"
+                          ? "destructive"
+                          : "secondary"
                       }
                     >
                       {manager.status}
@@ -104,29 +170,33 @@ const AdminTable = () => {
                       ? format(new Date(manager.createdAt), "yyyy-MM-dd")
                       : "Noma'lum"}
                   </td>
-
                   <td className="px-4 py-3">
                     <DropdownMenu>
-                      <DropdownMenuTrigger className="flex w-full items-end justify-center">
+                      {user?.role === "admin" ? (
                         <MoreHorizontal className="cursor-pointer " />
-                      </DropdownMenuTrigger>
+                      ) : (
+                        <DropdownMenuTrigger className="flex w-full items-end justify-center">
+                          <MoreHorizontal className="cursor-pointer " />
+                        </DropdownMenuTrigger>
+                      )}
                       <DropdownMenuContent>
                         <DropdownMenuItem
+                          className="cursor-pointer text-blue-400"
                           onClick={() => {
                             setSelectedAdmin(manager);
                             setOpenEdit(true);
                           }}
                         >
-                          Edit
+                          Tahrirlash
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {
                             setSelectedAdminId(manager._id);
                             setOpenDelete(true);
                           }}
-                          className="text-red-500"
+                          className="text-red-500 cursor-pointer"
                         >
-                          Delete
+                          Ishdan bo‘shatish
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -145,7 +215,6 @@ const AdminTable = () => {
             admin={selectedAdmin}
           />
         )}
-
         {selectedAdminId && openDelete && (
           <DeleteAdminModal
             open={openDelete}
@@ -153,7 +222,6 @@ const AdminTable = () => {
             adminId={selectedAdminId}
           />
         )}
-
         {openAdd && (
           <AddAdminModal
             open={openAdd}

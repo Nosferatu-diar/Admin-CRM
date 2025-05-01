@@ -75,12 +75,7 @@ const AddAdminModal: React.FC<Props> = ({ open, setOpen }) => {
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
           />
-          <Label htmlFor="role">role</Label>
-          <Input
-            placeholder="Role"
-            value={form.role}
-            onChange={(e) => setForm({ ...form, role: e.target.value })}
-          />
+
           <Label htmlFor="work_date">Work Date</Label>
           <Input
             type="date"

@@ -161,3 +161,30 @@ export const useUploadImage = () => {
     },
   });
 };
+
+export const useChangePassword = () => {
+  const notify = notificationApi();
+  return useMutation({
+    mutationKey: ["admins"],
+    mutationFn: (data: { current_password: string; new_password: string }) =>
+      request.post("/api/auth/edit-password", data),
+    onSuccess() {
+      notify("change_password");
+    },
+  });
+};
+
+export const useEditManager = () => {
+  const notify = notificationApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["edit-manager"],
+    mutationFn: (data: { _id: string; name?: string; email?: string }) => {
+      return request.post("/api/staff/edited-manager", data);
+    },
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ["Managers"] });
+      notify("edit_manager");
+    },
+  });
+};
