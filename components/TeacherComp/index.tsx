@@ -6,17 +6,14 @@ import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { request } from "@/request";
 import { Loader, MoreHorizontal } from "lucide-react";
-import { ManagersType, UserType } from "@/@types";
+import { TeacherType, UserType } from "@/@types";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import EditAdminModal from "./EditAdminModal";
-import DeleteAdminModal from "./DeleteAdminModal";
 import { Button } from "../ui/button";
-import AddAdminModal from "./AddAdminModal";
 import Image from "next/image";
 import Cookies from "js-cookie";
 import { Input } from "@/components/ui/input";
@@ -28,14 +25,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDebounce } from "use-debounce";
+import EditTeacherModal from "./EditTeacherModal";
+import DeleteTeacherModal from "./DeleteTeacherModal";
+import AddTeacherModal from "./AddTeacherModal";
 
 type Params = {
   status?: string;
   search?: string;
 };
 
-const AdminTable = () => {
-  const [selectedAdmin, setSelectedAdmin] = useState<ManagersType | null>(null);
+const TeacherComp = () => {
+  const [selectedAdmin, setSelectedAdmin] = useState<TeacherType | null>(null);
   const [selectedAdminId, setSelectedAdminId] = useState<string | null>(null);
   const [user, setUser] = useState<UserType | null>(null);
   const [openDelete, setOpenDelete] = useState(false);
@@ -56,7 +56,7 @@ const AdminTable = () => {
       if (status !== "all") queryParams.status = status;
       if (debouncedSearch.trim()) queryParams.search = debouncedSearch.trim();
 
-      const res = await request.get("/api/staff/all-admins", {
+      const res = await request.get("/api/teacher/get-all-teachers", {
         params: queryParams,
       });
       return res.data.data;
@@ -92,7 +92,7 @@ const AdminTable = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold">Adminlar</h1>
+        <h1 className="text-xl font-bold">Ustozlar</h1>
         <div className="flex items-center gap-2">
           <Input
             value={search}
@@ -111,7 +111,7 @@ const AdminTable = () => {
             </SelectContent>
           </Select>
           <Button variant="outline" onClick={() => setOpenAdd(true)}>
-            Admin Qo‘shish
+            Ustoz Qo‘shish
           </Button>
         </div>
       </div>
@@ -122,17 +122,17 @@ const AdminTable = () => {
             <thead className="bg-gray-100 dark:bg-zinc-900 text-gray-700 dark:text-white border-b">
               <tr>
                 <th className="px-4 py-3">#</th>
-                <th className="px-4 py-3">Img</th>
-                <th className="px-4 py-3">First Name</th>
-                <th className="px-4 py-3">Last Name</th>
+                <th className="px-4 py-3">Rasm</th>
+                <th className="px-4 py-3">Ism</th>
+                <th className="px-4 py-3">Familiya</th>
                 <th className="px-4 py-3">Email</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Last Active</th>
+                <th className="px-4 py-3">Holati</th>
+                <th className="px-4 py-3">Oxirgi faollik</th>
                 <th className="px-4 py-3">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {data?.map((manager: ManagersType, index: number) => (
+              {data?.map((manager: TeacherType, index: number) => (
                 <tr key={manager._id} className="border-b hover:bg-muted">
                   <td className="px-4 py-3 font-semibold">{index + 1}</td>
                   <td className="w-[40px] h-[40px] bg-black dark:bg-white rounded-full relative flex items-center justify-center font-bold text-white dark:text-black">
@@ -170,12 +170,12 @@ const AdminTable = () => {
                   </td>
                   <td className="px-4 py-3">
                     <DropdownMenu>
-                      {user?.role === "admin" ? (
-                        <MoreHorizontal className="cursor-pointer " />
-                      ) : (
+                      {user?.role === "admin" || "manager" ? (
                         <DropdownMenuTrigger className="flex w-full items-end justify-center">
                           <MoreHorizontal className="cursor-pointer " />
                         </DropdownMenuTrigger>
+                      ) : (
+                        <MoreHorizontal className="cursor-pointer " />
                       )}
                       <DropdownMenuContent>
                         <DropdownMenuItem
@@ -207,21 +207,21 @@ const AdminTable = () => {
 
         {/* Modal windows */}
         {selectedAdmin && openEdit && (
-          <EditAdminModal
+          <EditTeacherModal
             open={openEdit}
             setOpen={setOpenEdit}
             admin={selectedAdmin}
           />
         )}
         {selectedAdminId && openDelete && (
-          <DeleteAdminModal
+          <DeleteTeacherModal
             open={openDelete}
             setOpen={setOpenDelete}
             adminId={selectedAdminId}
           />
         )}
         {openAdd && (
-          <AddAdminModal
+          <AddTeacherModal
             open={openAdd}
             setOpen={setOpenAdd}
             admin={{
@@ -230,6 +230,9 @@ const AdminTable = () => {
               last_name: "",
               email: "",
               status: "faol",
+              phone: "",
+              password: "",
+              field: "",
             }}
           />
         )}
@@ -238,4 +241,4 @@ const AdminTable = () => {
   );
 };
 
-export default AdminTable;
+export default TeacherComp;

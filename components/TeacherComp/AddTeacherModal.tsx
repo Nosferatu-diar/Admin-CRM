@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useEditedAdmin } from "@/request/mutation";
+import { useCreateTeacher } from "@/request/mutation";
 import { Label } from "../ui/label";
 import {
   Select,
@@ -16,57 +16,60 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { useQueryClient } from "@tanstack/react-query";
+} from "@/components/ui/select";
 
 export interface Props {
   open: boolean;
-  setOpen: (value: boolean) => void;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   admin: {
     _id: string;
     first_name: string;
     last_name: string;
     email: string;
+    phone: string;
+    password: string;
     status: string;
+    field: string;
   };
 }
 
-const EditAdminModal = ({ open, setOpen, admin }: Props) => {
-  const { mutate, isPending } = useEditedAdmin();
-  const queryClient = useQueryClient();
-
+const AddTeacherModal: React.FC<Props> = ({ open, setOpen }) => {
   const [form, setForm] = useState({
-    _id: admin._id,
-    first_name: admin.first_name,
-    last_name: admin.last_name,
-    email: admin.email,
-    status: admin.status,
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+    phone: "",
+    field: "",
   });
 
+  const { mutate, isPending } = useCreateTeacher();
+
   const handleSubmit = () => {
+    if (
+      !form.first_name ||
+      !form.last_name ||
+      !form.email ||
+      !form.password ||
+      !form.phone ||
+      !form.field
+    ) {
+      alert("Iltimos, barcha maydonlarni to‘ldiring!");
+      return;
+    }
+
     mutate(form, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["admins"] });
         setOpen(false);
       },
     });
   };
 
-  React.useEffect(() => {
-    setForm({
-      _id: admin._id,
-      first_name: admin.first_name,
-      last_name: admin.last_name,
-      email: admin.email,
-      status: admin.status,
-    });
-  }, [admin]);
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Admin</DialogTitle>
+          <DialogTitle>Yangi Ustoz Qo&#39;shish</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-4">
           <Label htmlFor="first_name">First Name</Label>
@@ -87,22 +90,38 @@ const EditAdminModal = ({ open, setOpen, admin }: Props) => {
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
-          <Label htmlFor="status">Status</Label>
-          {/* select */}
+          <Label htmlFor="password">Password</Label>
+          <Input
+            placeholder="Password"
+            type="password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+          />
+          <Label htmlFor="phone">Phone</Label>
+          <Input
+            placeholder="Phone"
+            value={form.phone}
+            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+          />
+
+          <Label htmlFor="field">Yo‘nalish</Label>
           <Select
-            value={form.status}
-            onValueChange={(val) => setForm({ ...form, status: val })}
+            value={form.field}
+            onValueChange={(value) => setForm({ ...form, field: value })}
           >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Statusni tanlang" />
+            <SelectTrigger>
+              <SelectValue placeholder="Yo‘nalishni tanlang" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="faol">Faol</SelectItem>
-              <SelectItem value="ta'tilda">Tatilda</SelectItem>
+              <SelectItem value="Frontend">Frontend</SelectItem>
+              <SelectItem value="Backend">Backend</SelectItem>
+              <SelectItem value="Flutter">Flutter</SelectItem>
+              <SelectItem value="FullStack">FullStack</SelectItem>
             </SelectContent>
           </Select>
+
           <Button onClick={handleSubmit} disabled={isPending}>
-            {isPending ? "Saqlanmoqda..." : "Save Changes"}
+            {isPending ? "Saqlanmoqda..." : "Ustoz Qo'shish"}
           </Button>
         </div>
       </DialogContent>
@@ -110,4 +129,4 @@ const EditAdminModal = ({ open, setOpen, admin }: Props) => {
   );
 };
 
-export default EditAdminModal;
+export default AddTeacherModal;

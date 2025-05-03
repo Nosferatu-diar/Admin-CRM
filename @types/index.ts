@@ -34,6 +34,21 @@ export interface ManagersType {
   role?: string;
 }
 
+export interface TeacherType {
+  _id: string;
+  first_name: string;
+  last_name: string;
+  createdAt?: string;
+  email: string;
+  status: string;
+  image?: string | null;
+  phone?: string | null;
+  passwoed?: string | null;
+  last_active_date?: string;
+  field: string | null;
+  role?: string;
+}
+
 export interface SidebarMenuType {
   id: number;
   title: string;

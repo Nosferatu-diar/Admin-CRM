@@ -6,6 +6,7 @@ import type { UserType } from "@/@types";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { notificationApi } from "@/generics/nitification";
+
 type ProfileUpdatePayload = {
   email: string;
   first_name: string;
@@ -185,6 +186,28 @@ export const useEditManager = () => {
     onSuccess() {
       queryClient.invalidateQueries({ queryKey: ["Managers"] });
       notify("edit_manager");
+    },
+  });
+};
+
+export const useCreateTeacher = () => {
+  const notify = notificationApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["create-teacher"],
+    mutationFn: (data: {
+      first_name: string;
+      last_name: string;
+      email: string;
+      phone: string;
+      password: string;
+      field: string;
+    }) => {
+      return request.post("/api/teacher/create-teacher", data);
+    },
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+      notify("create_teacher");
     },
   });
 };

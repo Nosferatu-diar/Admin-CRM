@@ -31,7 +31,7 @@ export interface Props {
   };
 }
 
-const EditAdminModal = ({ open, setOpen, admin }: Props) => {
+const EditTeacherModal = ({ open, setOpen, admin }: Props) => {
   const { mutate, isPending } = useEditedAdmin();
   const queryClient = useQueryClient();
 
@@ -110,4 +110,4 @@ const EditAdminModal = ({ open, setOpen, admin }: Props) => {
   );
 };
 
-export default EditAdminModal;
+export default EditTeacherModal;
