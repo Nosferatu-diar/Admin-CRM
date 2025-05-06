@@ -16,7 +16,7 @@ interface Props {
   adminId: string;
 }
 
-const DeleteTeacherModal = ({ open, setOpen, adminId }: Props) => {
+const DeleteStudentModal = ({ open, setOpen, adminId }: Props) => {
   const { mutate, isPending } = useTeacherDelete();
 
   const handleDelete = () => {
@@ -53,4 +53,4 @@ const DeleteTeacherModal = ({ open, setOpen, adminId }: Props) => {
   );
 };
 
-export default DeleteTeacherModal;
+export default DeleteStudentModal;

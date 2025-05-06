@@ -4,6 +4,18 @@ export interface ChildrenType {
   children: React.ReactNode;
 }
 
+export interface SidebarMenuType {
+  id: number;
+  title: string;
+  path: string;
+  Icon: React.ElementType;
+}
+
+export interface Breadcrmb_menuMenuType {
+  id: number;
+  title: string;
+  path: string;
+}
 export interface UserType {
   id?: string;
   _id?: string;
@@ -49,15 +61,34 @@ export interface TeacherType {
   role?: string;
 }
 
-export interface SidebarMenuType {
-  id: number;
-  title: string;
-  path: string;
-  Icon: React.ElementType;
+export interface Teacher {
+  _id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
 }
 
-export interface Breadcrmb_menuMenuType {
-  id: number;
-  title: string;
-  path: string;
+export interface Student {
+  _id: string;
+  first_name: string;
+  email: string;
+  status: string;
+  password: string;
+  last_name: string;
+  phohe: string;
+  groups: string[];
+}
+
+export interface GroupType {
+  _id: string;
+  name: string;
+  teacher: string | Teacher;
+  students_count?: number;
+  started_group: string | Date;
+  end_group: string | Date;
+  disable: boolean;
+  is_deleted: boolean;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 }

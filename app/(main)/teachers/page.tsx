@@ -15,7 +15,7 @@ const getTeacher = async () => {
 const Teachers = async () => {
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({
-    queryKey: ["Managers"],
+    queryKey: ["teachers"],
     queryFn: getTeacher,
   });
   const dehydratedState = dehydrate(queryClient);

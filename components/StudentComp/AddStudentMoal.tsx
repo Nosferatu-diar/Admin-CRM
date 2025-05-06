@@ -34,7 +34,7 @@ export interface Props {
   };
 }
 
-const AddTeacherModal: React.FC<Props> = ({ open, setOpen }) => {
+const AddStudentModal: React.FC<Props> = ({ open, setOpen }) => {
   const { mutate, isPending } = useCreateTeacher();
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
@@ -134,4 +134,4 @@ const AddTeacherModal: React.FC<Props> = ({ open, setOpen }) => {
   );
 };
 
-export default AddTeacherModal;
+export default AddStudentModal;

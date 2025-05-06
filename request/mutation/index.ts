@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { request } from "..";
-import type { UserType } from "@/@types";
+import type { Student, UserType } from "@/@types";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { notificationApi } from "@/generics/nitification";
@@ -208,6 +208,78 @@ export const useCreateTeacher = () => {
     onSuccess() {
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
       notify("create_teacher");
+    },
+    onError(err) {
+      if ((err as { response?: { data?: unknown } })?.response?.data) {
+        console.error(
+          (err as { response?: { data?: unknown } }).response?.data
+        );
+      } else {
+        console.error(err);
+      }
+      notify("create_teacher_error");
+    },
+  });
+};
+
+export const useTeacherDelete = () => {
+  const notify = notificationApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["delete-teacher"],
+    mutationFn: (id: string) => {
+      return request.delete("/api/teacher/fire-teacher", {
+        data: { _id: id },
+      });
+    },
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+      notify("delete_teacher");
+    },
+  });
+};
+
+export const useReturnTeacher = () => {
+  const notify = notificationApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["return-teacher"],
+    mutationFn: (id: string) => {
+      return request.post("/api/teacher/return-teacher", { _id: id });
+    },
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+      notify("return_teacher");
+    },
+  });
+};
+
+export const useCreateGroup = () => {
+  const notify = notificationApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["create-group"],
+    mutationFn: (data: { name: string; description: string }) => {
+      return request.post("/api/group/create-group", data);
+    },
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
+      notify("create_group");
+    },
+  });
+};
+
+export const useCreateStudent = () => {
+  const notify = notificationApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["create-student"],
+    mutationFn: (data: Student) => {
+      return request.post("/api/student/create-student", data);
+    },
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      notify("create_student");
     },
   });
 };

@@ -12,7 +12,12 @@ type NotificationApiType =
   | "upload_image"
   | "change_password"
   | "edit_manager"
-  | "create_teacher";
+  | "create_teacher"
+  | "create_teacher_error"
+  | "delete_teacher"
+  | "return_teacher"
+  | "create_group"
+  | "create_student";
 
 export const notificationApi = () => {
   const notify = (type: NotificationApiType) => {
@@ -41,6 +46,16 @@ export const notificationApi = () => {
         return toast.success("Ma'lumotlar muvaffaqiyatli o'zgartirildi!");
       case "create_teacher":
         return toast.success("O'qituvchi muvaffaqiyatli yaratildi!");
+      case "create_teacher_error":
+        return toast.error("O'qituvchi yaratishda xatolik!");
+      case "delete_teacher":
+        return toast.success("O'qituvchi muvaffaqiyatli o'chirildi!");
+      case "return_teacher":
+        return toast.success("O'qituvchi muvaffaqiyatli tiklandi!");
+      case "create_group":
+        return toast.success("Guruh muvaffaqiyatli yaratildi!");
+      case "create_student":
+        return toast.success("Talaba muvaffaqiyatli yaratildi!");
       default:
         break;
     }
