@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <Providres>
-      <html suppressHydrationWarning lang="en">
+      <html suppressHydrationWarning={true} lang="en">
         <body className={`${inter.className} antialiased`}>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
             <div className="flex h-screen overflow-hidden">

@@ -8,125 +8,176 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useCreateTeacher } from "@/request/mutation";
 import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCreateStudent } from "@/request/mutation";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useSearchGroups } from "./useSearchGroup";
+import { GroupType, Student } from "@/@types";
+import { cn } from "@/lib/utils";
+import { studentSchema } from "@/validation/student.schema";
+import { z } from "zod";
 
-export interface Props {
+const AddStudentModal = ({
+  open,
+  setOpen,
+}: {
   open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  admin: {
-    _id: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-    phone: string;
-    password: string;
-    status: string;
-    field: string;
-  };
-}
-
-const AddStudentModal: React.FC<Props> = ({ open, setOpen }) => {
-  const { mutate, isPending } = useCreateTeacher();
+  setOpen: (value: boolean) => void;
+  admin: Student;
+}) => {
+  const { mutate, isPending } = useCreateStudent();
   const queryClient = useQueryClient();
+
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
-    email: "",
-    password: "",
     phone: "",
-    field: "",
   });
 
-  const handleSubmit = () => {
-    if (
-      !form.first_name ||
-      !form.last_name ||
-      !form.email ||
-      !form.password ||
-      !form.phone ||
-      !form.field
-    ) {
-      alert("Iltimos, barcha maydonlarni to‘ldiring!");
-      return;
-    }
+  const [search, setSearch] = useState("");
+  const { data: groups } = useSearchGroups(search);
+  const [selectedGroupId, setSelectedGroupId] = useState("");
 
-    mutate(form, {
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof z.infer<typeof studentSchema>, string>>
+  >({});
+
+  const validate = () => {
+    const result = studentSchema.safeParse({ ...form, group: selectedGroupId });
+    if (!result.success) {
+      const fieldErrors: Partial<
+        Record<keyof z.infer<typeof studentSchema>, string>
+      > = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as keyof typeof fieldErrors;
+        fieldErrors[field] = err.message;
+      });
+      setErrors(fieldErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
+  };
+
+  const handleSubmit = () => {
+    if (!validate()) return;
+
+    const payload = {
+      ...form,
+      groups: [{ group: selectedGroupId }] as [{ group: string }],
+    };
+
+    mutate(payload, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["teachers"] });
+        queryClient.invalidateQueries({ queryKey: ["student"] });
         setOpen(false);
+        setForm({ first_name: "", last_name: "", phone: "" });
+        setSelectedGroupId("");
+        setSearch("");
+        setErrors({});
       },
     });
+  };
+
+  const handleGroupSelect = (groupId: string, groupName: string) => {
+    setSelectedGroupId(groupId);
+    setSearch(groupName);
+    setErrors((prev) => ({ ...prev, group: "" }));
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Yangi Ustoz Qo&#39;shish</DialogTitle>
+          <DialogTitle>Yangi O‘quvchi Qo‘shish</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col gap-4">
-          <Label htmlFor="first_name">First Name</Label>
-          <Input
-            placeholder="First Name"
-            value={form.first_name}
-            onChange={(e) => setForm({ ...form, first_name: e.target.value })}
-          />
-          <Label htmlFor="last_name">Last Name</Label>
-          <Input
-            placeholder="Last Name"
-            value={form.last_name}
-            onChange={(e) => setForm({ ...form, last_name: e.target.value })}
-          />
-          <Label htmlFor="email">Email</Label>
-          <Input
-            placeholder="Email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-          />
-          <Label htmlFor="password">Password</Label>
-          <Input
-            placeholder="Password"
-            type="password"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-          />
-          <Label htmlFor="phone">Phone</Label>
-          <Input
-            placeholder="Phone"
-            value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-          />
 
-          <Label htmlFor="field">Yo‘nalish</Label>
-          <Select
-            value={form.field}
-            onValueChange={(value) => setForm({ ...form, field: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Yo‘nalishni tanlang" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Frontend dasturlash">
-                Frontend dasturlash
-              </SelectItem>
-              <SelectItem value="Backend dasturlash">
-                Backend dasturlash
-              </SelectItem>
-              <SelectItem value="Rus tili">Rus tili</SelectItem>
-              <SelectItem value="Ingliz tili">Ingliz tili</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex flex-col gap-4">
+          <div>
+            <Label>Ism</Label>
+            <Input
+              placeholder="Ism"
+              value={form.first_name}
+              onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+              className={cn(errors.first_name && "border-red-500")}
+            />
+            {errors.first_name && (
+              <p className="text-red-500 text-sm mt-1">{errors.first_name}</p>
+            )}
+          </div>
+
+          <div>
+            <Label>Familiya</Label>
+            <Input
+              placeholder="Familiya"
+              value={form.last_name}
+              onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+              className={cn(errors.last_name && "border-red-500")}
+            />
+            {errors.last_name && (
+              <p className="text-red-500 text-sm mt-1">{errors.last_name}</p>
+            )}
+          </div>
+
+          <div>
+            <Label>Telefon</Label>
+            <Input
+              placeholder="Telefon"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              className={cn(errors.phone && "border-red-500")}
+            />
+            {errors.phone && (
+              <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+            )}
+          </div>
+
+          <div>
+            <Label>Guruhni tanlang</Label>
+            <Input
+              placeholder="Guruh nomini qidiring"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className={cn(errors.group && "border-red-500")}
+            />
+            {errors.group && (
+              <p className="text-red-500 text-sm mt-1">{errors.group}</p>
+            )}
+          </div>
+
+          {groups?.length > 0 && (
+            <div className="border rounded p-2 max-h-40 overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Guruh nomi</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {groups.map((group: GroupType) => (
+                    <TableRow
+                      key={group._id}
+                      onClick={() => handleGroupSelect(group._id, group.name)}
+                      className="cursor-pointer hover:bg-muted"
+                    >
+                      <TableCell>{group.name}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+
           <Button onClick={handleSubmit} disabled={isPending}>
-            {isPending ? "Saqlanmoqda..." : "Ustoz Qo'shish"}
+            {isPending ? "Qo'shilmoqda..." : "Qo‘shish"}
           </Button>
         </div>
       </DialogContent>

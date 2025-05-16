@@ -17,7 +17,18 @@ type NotificationApiType =
   | "delete_teacher"
   | "return_teacher"
   | "create_group"
-  | "create_student";
+  | "create_student"
+  | "edit_group"
+  | "delete_student"
+  | "return_student"
+  | "delete_manager"
+  | "create_manager"
+  | "create_course"
+  | "delete_course"
+  | "edit_course"
+  | "freeze_course"
+  | "unfreeze_course"
+  | "create_category";
 
 export const notificationApi = () => {
   const notify = (type: NotificationApiType) => {
@@ -56,6 +67,28 @@ export const notificationApi = () => {
         return toast.success("Guruh muvaffaqiyatli yaratildi!");
       case "create_student":
         return toast.success("Talaba muvaffaqiyatli yaratildi!");
+      case "edit_group":
+        return toast.success("Guruh muvaffaqiyatli o'zgartirildi!");
+      case "delete_student":
+        return toast.success("Talaba muvaffaqiyatli o'chirildi!");
+      case "return_student":
+        return toast.success("Talaba muvaffaqiyatli tiklandi!");
+      case "delete_manager":
+        return toast.success("Menejer muvaffaqiyatli o'chirildi!");
+      case "create_manager":
+        return toast.success("Menejer muvaffaqiyatli yaratildi!");
+      case "create_course":
+        return toast.success("Kurs muvaffaqiyatli yaratildi!");
+      case "delete_course":
+        return toast.success("Kurs muvaffaqiyatli o'chirildi!");
+      case "edit_course":
+        return toast.success("Kurs muvaffaqiyatli o'zgartirildi!");
+      case "freeze_course":
+        return toast.success("Kurs muvaffaqiyatli muzlatildi!");
+      case "unfreeze_course":
+        return toast.success("Kurs muvaffaqiyatli tiklandi!");
+      case "create_category":
+        return toast.success("Kategoriya muvaffaqiyatli yaratildi!");
       default:
         break;
     }

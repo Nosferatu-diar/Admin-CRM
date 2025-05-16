@@ -63,16 +63,19 @@ const Header = () => {
           </div>
           <div className="w-[40px] h-[40px] bg-black dark:bg-white rounded-full relative flex items-center justify-center font-bold text-white dark:text-black">
             <Link href={"/profile"}>
-              {user?.image ? (
-                <Image
-                  src={user.image}
-                  alt={user.first_name || "user avatar"}
-                  fill
-                  className="rounded-full object-cover"
-                />
-              ) : (
-                user?.first_name?.slice(0, 1)
-              )}
+              <div className="w-[40px] h-[40px] bg-black dark:bg-white rounded-full relative flex items-center justify-center font-bold text-white dark:text-black">
+                {user?.image ? (
+                  <Image
+                    src={user.image}
+                    alt={user.first_name || "user avatar"}
+                    fill
+                    sizes="40px"
+                    className="rounded-full object-cover"
+                  />
+                ) : (
+                  user?.first_name?.slice(0, 1)
+                )}
+              </div>
             </Link>
           </div>
         </div>

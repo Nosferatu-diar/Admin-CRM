@@ -8,19 +8,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useTeacherDelete } from "@/request/mutation";
+import { useDeleteCourse } from "@/request/mutation";
 
 interface Props {
   open: boolean;
   setOpen: (value: boolean) => void;
-  adminId: string;
+  courseId: string;
 }
 
-const DeleteTeacherModal = ({ open, setOpen, adminId }: Props) => {
-  const { mutate, isPending } = useTeacherDelete();
+const DeleteCourseModal = ({ open, setOpen, courseId }: Props) => {
+  const { mutate, isPending } = useDeleteCourse();
 
   const handleDelete = () => {
-    mutate(adminId, {
+    mutate(courseId, {
       onSuccess: () => {
         setOpen(false);
       },
@@ -31,22 +31,21 @@ const DeleteTeacherModal = ({ open, setOpen, adminId }: Props) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>O&apos;chirishingizga ishonchingiz komilmi?</DialogTitle>
+          <DialogTitle>Ishonchingiz komilmi?</DialogTitle>
         </DialogHeader>
         <div className="text-muted-foreground">
-          Ushbu amalni bajarish orqali ustoz o&apos;chiriladi va qayta
-          tiklanmaydi.
+          Bu amalni qaytarib bo‘lmaydi. Kurs butunlay o‘chiriladi.
         </div>
         <DialogFooter className="gap-2 pt-4">
           <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
+            Bekor qilish
           </Button>
           <Button
             variant="destructive"
             onClick={handleDelete}
             disabled={isPending}
           >
-            {isPending ? "O'chirilmoqda..." : "O'chirish"}
+            {isPending ? "Kurs o‘chirilmoqda..." : "O‘chirish"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -54,4 +53,4 @@ const DeleteTeacherModal = ({ open, setOpen, adminId }: Props) => {
   );
 };
 
-export default DeleteTeacherModal;
+export default DeleteCourseModal;

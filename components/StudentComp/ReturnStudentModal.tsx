@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useReturnTeacher } from "@/request/mutation";
+import { useReturnStudent } from "@/request/mutation";
 
 interface Props {
   open: boolean;
@@ -21,7 +21,7 @@ interface Props {
 }
 
 const ReturnStudentModal = ({ open, setOpen, admin }: Props) => {
-  const { mutate, isPending } = useReturnTeacher();
+  const { mutate, isPending } = useReturnStudent();
 
   const handleReturn = () => {
     if (!admin?._id) return;

@@ -7,3 +7,11 @@ export const request = axios.create({
     Authorization: `Bearer ${Cookies.get("token")}`,
   },
 });
+
+// request.interceptors.request.use((config) => {
+//   const token = Cookies.get("token");
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`;
+//   }
+//   return config;
+// });

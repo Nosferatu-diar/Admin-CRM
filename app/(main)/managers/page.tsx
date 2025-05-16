@@ -25,12 +25,7 @@ const Managers = async () => {
   return (
     <div>
       <HydrationBoundary state={dehydratedState}>
-        <div className="space-y-4">
-          <h1 className="text-xl font-bold">Menejerlar</h1>
-          <div className="overflow-hidden ">
-            <ManagerTable />
-          </div>
-        </div>
+        <ManagerTable />
       </HydrationBoundary>
     </div>
   );

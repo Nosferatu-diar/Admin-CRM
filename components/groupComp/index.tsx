@@ -1,42 +1,47 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { ScrollArea } from "../ui/scroll-area";
-// import { Badge } from "../ui/badge";
-// import { format } from "date-fns";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { request } from "@/request";
 import { Loader, MoreHorizontal } from "lucide-react";
 import { GroupType } from "@/@types";
 import {
   DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { Button } from "../ui/button";
 import Cookies from "js-cookie";
-
 import AddGroupModal from "./AddGroupModal";
+import { format } from "date-fns";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const GroupComp = () => {
   const [openAdd, setOpenAdd] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [selectedGroup, setSelectedGroup] = useState<GroupType | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["groups"],
     queryFn: async () => {
-      const queryParams: Record<string, string> = {};
-      const res = await request.get("/api/group/get-all-group", {
-        params: queryParams,
-      });
+      const res = await request.get("/api/group/get-all-group");
       return res.data.data;
     },
   });
-  console.log(data);
-  useEffect(() => {
+
+  React.useEffect(() => {
     const updateUserFromCookie = () => {
       const cookieUser = Cookies.get("user");
       if (cookieUser) {
         try {
-          //   setUser(JSON.parse(cookieUser));
+          // setUser(JSON.parse(cookieUser));
         } catch (error) {
           console.error("Cookie parsing error:", error);
         }
@@ -59,76 +64,108 @@ const GroupComp = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <h1 className="text-xl font-bold">Guruhlar</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex justify-end">
           <Button variant="outline" onClick={() => setOpenAdd(true)}>
-            Guruh Qo‘shish
+            Guruh Qo&apos;shish
           </Button>
         </div>
       </div>
 
-      <div className="w-full overflow-x-auto">
-        <ScrollArea>
-          <table className="min-w-full text-sm text-left table-auto">
-            <thead className="bg-gray-100 dark:bg-zinc-900 text-gray-700 dark:text-white border-b">
-              <tr>
-                <th className="px-4 py-3">No</th>
-                <th className="px-4 py-3">Guruh nomi</th>
-                <th className="px-4 py-3">Ustozlar</th>
-                <th className="px-4 py-3">Oquvchilar soni</th>
-                <th className="px-4 py-3">Boshlangan vaqti</th>
-                <th className="px-4 py-3">Tugagan vaqti</th>
-                <th className="px-4 py-3">Amallar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data?.map((group: GroupType, index: number) => (
-                <tr key={group._id} className="border-b hover:bg-muted">
-                  <td className="px-4 py-3 font-semibold">{index + 1}</td>
-                  <td className="px-4 py-3">{group.name}</td>
-                  <td className="px-4 py-3">
-                    {typeof group.teacher === "object"
-                      ? `${group.teacher.first_name} ${group.teacher.last_name}`
-                      : group.teacher}
-                  </td>
-                  <td className="px-4 py-3">{group.students_count ?? 0}</td>
-                  <td className="px-4 py-3">
-                    {group.started_group
-                      ? new Date(group.started_group).toLocaleDateString()
-                      : "Nomaʼlum"}
-                  </td>
-                  <td className="px-4 py-3">
-                    {group.end_group
-                      ? new Date(group.end_group).toLocaleDateString()
-                      : "Nomaʼlum"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className="flex w-full items-end justify-center">
-                        <MoreHorizontal className="cursor-pointer" />
-                      </DropdownMenuTrigger>
-                    </DropdownMenu>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollArea>
-
-        {openAdd && (
-          <AddGroupModal
-            open={openAdd}
-            setOpen={setOpenAdd}
-            admin={{
-              name: "",
-              teacher: "",
-              description: "",
-              started_group: new Date(),
-            }}
-          />
-        )}
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader className="bg-gray-100 dark:bg-zinc-900">
+            <TableRow>
+              <TableHead className="w-[50px]">#</TableHead>
+              <TableHead>Guruh nomi</TableHead>
+              <TableHead>Ustoz</TableHead>
+              <TableHead>O&apos;quvchilar soni</TableHead>
+              <TableHead>Boshlanish vaqti</TableHead>
+              <TableHead>Tugash vaqti</TableHead>
+              <TableHead className="text-right">Amallar</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data?.map((group: GroupType, index: number) => (
+              <TableRow key={group._id} className="hover:bg-muted/50">
+                <TableCell className="font-medium">{index + 1}</TableCell>
+                <TableCell className="font-medium">{group.name}</TableCell>
+                <TableCell>
+                  {typeof group.teacher === "object"
+                    ? `${group.teacher.first_name} ${group.teacher.last_name}`
+                    : group.teacher}
+                </TableCell>
+                <TableCell>{group.students_count ?? 0}</TableCell>
+                <TableCell>
+                  {group.started_group
+                    ? format(new Date(group.started_group), "yyyy-MM-dd")
+                    : "Noma'lum"}
+                </TableCell>
+                <TableCell>
+                  {group.end_group
+                    ? format(new Date(group.end_group), "yyyy-MM-dd")
+                    : "Noma'lum"}
+                </TableCell>
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        className="cursor-pointer text-blue-400"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedGroup(group);
+                          // Add edit functionality here
+                        }}
+                      >
+                        Tahrirlash
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-red-500 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Add delete functionality here
+                        }}
+                      >
+                        O&apos;chirish
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
+
+      {/* Empty state */}
+      {data?.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-12 gap-2 text-center">
+          <p className="text-muted-foreground">Guruhlar topilmadi</p>
+          <Button variant="outline" onClick={() => setOpenAdd(true)}>
+            Yangi guruh qo&apos;shish
+          </Button>
+        </div>
+      )}
+
+      {/* Modal windows */}
+      {openAdd && (
+        <AddGroupModal
+          open={openAdd}
+          setOpen={setOpenAdd}
+          admin={{
+            name: "",
+            teacher: "",
+            description: "",
+            started_group: new Date(),
+          }}
+        />
+      )}
     </div>
   );
 };

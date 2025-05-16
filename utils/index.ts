@@ -6,6 +6,7 @@ import {
   HomeIcon,
   Settings,
   ShieldUser,
+  SquareStack,
   UserRoundPen,
   Users,
 } from "lucide-react";
@@ -46,6 +47,12 @@ export const sidebar_menu: SidebarMenuType[] = [
     title: "Guruhlar",
     path: "/groups",
     Icon: Boxes,
+  },
+  {
+    id: 7,
+    title: "Kurslar",
+    path: "/courses",
+    Icon: SquareStack,
   },
 ];
 
@@ -104,5 +111,10 @@ export const breadcrmb_menu: Breadcrmb_menuMenuType[] = [
     id: 8,
     title: "Profil",
     path: "/profile",
+  },
+  {
+    id: 9,
+    title: "Kurslar",
+    path: "/courses",
   },
 ];

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 const AuthLayout = ({ children }: ChildrenType) => {
   return (
     <Providres>
-      <html suppressHydrationWarning lang="en">
+      <html suppressHydrationWarning={true} lang="en">
         <body className={`${inter.className} antialiased`}>
           {children} <Toaster position="top-center" />
         </body>

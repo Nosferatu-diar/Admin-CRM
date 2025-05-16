@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useTeacherDelete } from "@/request/mutation";
+import { useDeletedAdmin } from "@/request/mutation";
 
 interface Props {
   open: boolean;
@@ -16,8 +16,8 @@ interface Props {
   adminId: string;
 }
 
-const DeleteTeacherModal = ({ open, setOpen, adminId }: Props) => {
-  const { mutate, isPending } = useTeacherDelete();
+const DeleteManagerModal = ({ open, setOpen, adminId }: Props) => {
+  const { mutate, isPending } = useDeletedAdmin();
 
   const handleDelete = () => {
     mutate(adminId, {
@@ -31,11 +31,10 @@ const DeleteTeacherModal = ({ open, setOpen, adminId }: Props) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>O&apos;chirishingizga ishonchingiz komilmi?</DialogTitle>
+          <DialogTitle>Are you sure?</DialogTitle>
         </DialogHeader>
         <div className="text-muted-foreground">
-          Ushbu amalni bajarish orqali ustoz o&apos;chiriladi va qayta
-          tiklanmaydi.
+          This action cannot be undone. This will permanently delete this admin.
         </div>
         <DialogFooter className="gap-2 pt-4">
           <Button variant="outline" onClick={() => setOpen(false)}>
@@ -46,7 +45,7 @@ const DeleteTeacherModal = ({ open, setOpen, adminId }: Props) => {
             onClick={handleDelete}
             disabled={isPending}
           >
-            {isPending ? "O'chirilmoqda..." : "O'chirish"}
+            {isPending ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -54,4 +53,4 @@ const DeleteTeacherModal = ({ open, setOpen, adminId }: Props) => {
   );
 };
 
-export default DeleteTeacherModal;
+export default DeleteManagerModal;
